@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Busca tu Pokémon</title>
+    <!-- Archivos CSS -->
+    <link href="./dist/css/tabler.min.css?1684106062" rel="stylesheet" />
+    <link href="./dist/css/tabler-flags.min.css?1684106062" rel="stylesheet" />
+    <link href="./dist/css/tabler-payments.min.css?1684106062" rel="stylesheet" />
+    <link href="./dist/css/tabler-vendors.min.css?1684106062" rel="stylesheet" />
+    <link href="./dist/css/demo.min.css?1684106062" rel="stylesheet" />
+    <style>
+        @import url('https://rsms.me/inter/inter.css');
+
+        :root {
+            --tblr-font-sans-serif: 'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
+        }
+
+        body {
+            font-feature-settings: "cv03", "cv04", "cv11";
+        }
+
+        .pokemon-image {
+            max-width: 300px;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body class=" d-flex flex-column">
+    <div class="page page-center">
+        <div class="container container-tight py-4">
+            <div class="text-center mb-4">
+                <a href="." class="navbar-brand navbar-brand-autodark">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/800px-International_Pok%C3%A9mon_logo.svg.png"
+                        height="70" alt="">
+                </a>
+            </div>
+            <div class="card card-md">
+                <div class="card-body">
+                    <h2 class="h2 text-center mb-4">Busca tu Pokémon</h2>
+                    <form action="" method="post" autocomplete="off" novalidate>
+                        <div class="mb-3 text-center">
+                            <label class="mb-3 form-label">Ingresa el nombre de un Pokémon</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="pokemonName"
+                                    placeholder="Nombre del Pokémon">
+                                <button type="submit" class="btn btn-primary">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="pokemonInfo" class="mt-4"></div>
+                </div>
+                <div class="text-center text-muted mt-3">
+                    ¿No tienes una cuenta todavía? <a href="./sign-up.html" tabindex="-1">Regístrate</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Librerías JS -->
+    <!-- Tabler Core -->
+    <script src="./dist/js/tabler.min.js?1684106062" defer></script>
+    <script src="./dist/js/demo.min.js?1684106062" defer></script>
+
+    <!-- Código JS para obtener la información del Pokémon desde la PokeAPI -->
+    <script>
+        function getPokemonInfo(pokemonName) {
+            fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
+                .then(response => response.json())
+                .then(data => {
+                    const pokemonInfo = document.getElementById("pokemonInfo");
+                    const type = data.types.map(type => type.type.name).join(', ');
+                    const moves = data.moves.slice(0, 10).map(move => move.move.name).join('<br>');
+                    const stats = data.stats.map(stat => `${stat.stat.name}: ${stat.base_stat}`).join('<br>');
+
+                    pokemonInfo.innerHTML = `
+                        <h4>${data.name}</h4>
+                        <img src="${data.sprites.front_default}" alt="Imagen del Pokémon" class="pokemon-image" />
+                        <p><strong>Tipo:</strong> ${type}</p>
+                        <p><strong>Primeros 10 movimientos:</strong><br>${moves}</p>
+                        <p><strong>Estadísticas:</strong><br>${stats}</p>
+                    `;
+                })
+                .catch(error => {
+                    console.log(error);
+                    alert('No se pudo obtener la información del Pokémon.');
+                });
+        }
+
+        document.querySelector("form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            const pokemonName = document.querySelector("input[name='pokemonName']").value.toLowerCase();
+            getPokemonInfo(pokemonName);
+        });
+    </script>
+</body>
+
+</html>
